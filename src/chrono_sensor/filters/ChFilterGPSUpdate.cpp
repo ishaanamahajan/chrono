@@ -29,21 +29,15 @@ ChFilterGPSUpdate::ChFilterGPSUpdate(ChVector<double> gps_reference, std::shared
     : m_ref(gps_reference), m_noise_model(noise_model), ChFilter("GPS Updater") {}
 
 CH_SENSOR_API void ChFilterGPSUpdate::Apply() {
-    ChVector<double> coords = {0, 0, 0};
-    float ch_time = 0;
-    float last_ch_time = 0;
-    if (m_GPSSensor->m_keyframes.size() > 0) {
-        for (auto c : m_GPSSensor->m_keyframes) {
-            ch_time += std::get<0>(c);
-            coords += std::get<1>(c);
-            last_ch_time = std::get<0>(c);
-        }
-        coords = coords / (double)(m_GPSSensor->m_keyframes.size());
-        ch_time = ch_time / (float)(m_GPSSensor->m_keyframes.size());
-    }
+    int curr_index = m_GPSSensor->m_keyframes.size() - 1;
+    float ch_time = std::get<0>(m_GPSSensor->m_keyframes[curr_index]);
+    float last_ch_time = std::get<0>(m_GPSSensor->m_keyframes[curr_index - 1]);
+    ChVector<double> coords = std::get<1>(m_GPSSensor->m_keyframes[curr_index]);
+    // printf("coords: %lf\n %lf\n", coords.x(), coords.y());
 
+    // printf("GPS Ref: (%.4f,%.4f,%.4f)\n", m_ref.x(), m_ref.y(), m_ref.z());
     if (m_noise_model) {
-        m_noise_model->AddNoise(coords);  // 3 is length of ChVector
+        m_noise_model->AddNoise(coords, last_ch_time, ch_time);  // 3 is length of ChVector
     }
 
     Cartesian2GPS(coords, m_ref);
@@ -55,7 +49,6 @@ CH_SENSOR_API void ChFilterGPSUpdate::Apply() {
     m_bufferOut->Buffer[0].Time = ch_time;
     m_bufferOut->LaunchedCount = m_GPSSensor->GetNumLaunches();
     m_bufferOut->TimeStamp = last_ch_time;
-
 }
 
 CH_SENSOR_API void ChFilterGPSUpdate::Initialize(std::shared_ptr<ChSensor> pSensor,

@@ -18,6 +18,7 @@
 #define CHNOISEMODEL_H
 #include "chrono_sensor/ChApiSensor.h"
 #include "chrono/core/ChVector.h"
+#include "chrono_sensor/utils/ChGPSUtils.h"
 #include <random>
 
 namespace chrono {
@@ -37,6 +38,7 @@ class CH_SENSOR_API ChNoiseModel {
     /// Function for adding noise to data
     /// @param data data to augment
     virtual void AddNoise(ChVector<double>& data) = 0;
+    virtual void AddNoise(ChVector<double>& data, float last_ch_time, float ch_time) = 0;
     // virtual void AddNoise(chrono::ChVector<float>& gyro, chrono::ChVector<float>& acc) = 0;
 };  // class ChNoiseModel
 
@@ -51,6 +53,7 @@ class CH_SENSOR_API ChNoiseNone : public ChNoiseModel {
     /// Function for adding noise to a set of values. This is empty and adds no noise.
     /// @param data data to augment
     virtual void AddNoise(ChVector<double>& data) {}
+    virtual void AddNoise(ChVector<double>& data, float last_ch_time, float ch_time) {}
 };
 
 class CH_SENSOR_API ChNoiseNormal : public ChNoiseModel {
@@ -66,6 +69,7 @@ class CH_SENSOR_API ChNoiseNormal : public ChNoiseModel {
     /// Noise addition function. Adds no noise for this model.
     /// @param data data to augment
     virtual void AddNoise(ChVector<double>& data);
+    virtual void AddNoise(ChVector<double>& data, float last_ch_time, float ch_time);
 
   private:
     std::minstd_rand m_generator;  ///< random number generator
@@ -89,6 +93,7 @@ class CH_SENSOR_API ChNoiseNormalDrift : public ChNoiseModel {
     /// Function for adding noise to data
     /// @param data data to augment
     virtual void AddNoise(ChVector<double>& data);
+    virtual void AddNoise(ChVector<double>& data, float last_ch_time, float ch_time);
 
   private:
     std::minstd_rand m_generator;  ///< random number generator
@@ -99,6 +104,51 @@ class CH_SENSOR_API ChNoiseNormalDrift : public ChNoiseModel {
     ChVector<double> m_stdev;  ///< standard deviation of normal distribution for gyroscope
     double m_drift_bias;       ///< bias component of gyroscope drift
     double m_tau_drift;        ///< time constant for gyroscope drift
+};
+
+// GPS Noise model based on Random Walks
+class CH_SENSOR_API ChNoiseRandomWalks : public ChNoiseModel {
+  public:
+    /// Class constructor with default tuning parameters
+    ChNoiseRandomWalks(float mean, float sigma, float noise_model_update_rate, ChVector<double> gps_reference);
+    /// Class constructor with custom tuning parameters
+    ChNoiseRandomWalks(float mean,
+                       float sigma,
+                       float noise_model_update_rate,
+                       double max_velocity,
+                       double max_acceleration,
+                       double max_nudge_proportion,
+                       ChVector<double> gps_reference);
+    /// Class destructor
+    ~ChNoiseRandomWalks() {}
+
+    /// Function for adding noise to data
+    /// @param data data to augment
+    virtual void AddNoise(ChVector<double>& data) {}
+    virtual void AddNoise(ChVector<double>& data, float last_ch_time, float ch_time);
+
+  private:
+    std::minstd_rand m_generator;  ///< random number generator
+    float m_mean;
+    float m_sigma;
+    double m_step_size;
+    double m_max_velocity;
+    double m_max_acceleration;
+    double m_max_nudge_proportion;
+    ChVector<double> m_gps_reference;
+    float m_last_updated_ch_time;
+    double m_bx;
+    double m_cx;
+    double m_by;
+    double m_cy;
+
+    double interpolate_weighted_avg(ChVector<double>& data,
+                                    float last_ch_time,
+                                    float ch_time,
+                                    double& meas,
+                                    double& dmeas);
+    double nudge(double meas, double maxR, double maxD);
+    void RandomWalk(double& meas, double& dmeas, double rand);
 };
 
 /// @} sensor_sensors
