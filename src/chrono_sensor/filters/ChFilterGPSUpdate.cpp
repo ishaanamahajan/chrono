@@ -33,9 +33,7 @@ CH_SENSOR_API void ChFilterGPSUpdate::Apply() {
     float ch_time = std::get<0>(m_GPSSensor->m_keyframes[curr_index]);
     float last_ch_time = std::get<0>(m_GPSSensor->m_keyframes[curr_index - 1]);
     ChVector<double> coords = std::get<1>(m_GPSSensor->m_keyframes[curr_index]);
-    // printf("coords: %lf\n %lf\n", coords.x(), coords.y());
-
-    // printf("GPS Ref: (%.4f,%.4f,%.4f)\n", m_ref.x(), m_ref.y(), m_ref.z());
+    // std::cout << "GPS coords: " << coords.x() << " " << coords.y() << " " << coords.z() << std::endl;
     if (m_noise_model) {
         m_noise_model->AddNoise(coords, last_ch_time, ch_time);  // 3 is length of ChVector
     }

@@ -90,7 +90,7 @@ ChVector<> gps_reference3(-89.412240758, 43.071986683, 0);
 double step_size = 1e-3;
 
 // Simulation end time
-float end_time = 30.0f;
+float end_time = 100.0f;
 
 // Save data
 bool save = true;
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
     // Create a stationary system to attach GPS Sensor to.
     // -------------------------------
     auto base = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 1, 1, true, false);
-    base->SetPos(ChVector<>(-89.412240758, 43.071986683, 0));
+    base->SetPos(ChVector<>(0, 0, 0));
     base->SetBodyFixed(true);  // the base does not move!
     sys.Add(base);
 
@@ -123,41 +123,13 @@ int main(int argc, char* argv[]) {
     // ---------------------------------------------
     // Create a GPS and add it to the sensor manager
     // ---------------------------------------------
-    // Create the gps noise model
-    // std::shared_ptr<ChNoiseModel> gps_noise_model;
+    auto gps_noise_model1 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.16, gps_noise_model_update_rate1, 0.03,
+                                                                          0.05, gps_reference1);
 
-    // Uncomment to use default constructor (must comment out custom constructor use below), only specifying sigma and
-    // gps_noise_model_update_rate). auto gps_noise_model1 = chrono_types::make_shared<ChNoiseRandomWalks>(0,
-    // 0.016289174978068626, gps_noise_model_update_rate1, gps_reference); auto gps_noise_model2 =
-    // chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.016289174978068626, gps_noise_model_update_rate2,
-    // gps_reference); auto gps_noise_model3 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.016289174978068626,
-    // gps_noise_model_update_rate3, gps_reference);
-
-    // Using custom parameter noise model constructor
-    // auto gps_noise_model1 = chrono_types::make_shared<ChNoiseRandomWalks>(0,1.7593000002591452e-05,
-    // gps_noise_model_update_rate1, 8.814992140085515e-07, 2.1699961831196593e-07, 0.5, gps_reference); auto
-    // gps_noise_model2 = chrono_types::make_shared<ChNoiseRandomWalks>(0,1.7583999998294075e-05,
-    // gps_noise_model_update_rate2, 1.6399467018622055e-06, 7.849493196515443e-06, 0.5, gps_reference); auto
-    // gps_noise_model3 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 1.5880999995943057e-05,
-    // gps_noise_model_update_rate3, 02.9299999937419953e-05, 0.0015749438058945734, 0.5, gps_reference); auto
-    // gps_noise_model1 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 1000, gps_noise_model_update_rate1,
-    // 0.0981280436381029, 0.024128399554804832, 0.2, gps_reference1); auto gps_noise_model1 =
-    // chrono_types::make_shared<ChNoiseRandomWalks>(0, 1.9570004226376052, gps_noise_model_update_rate1,
-    // 0.0981280436381029, 0.024128399554804832, 0.02, gps_reference); auto gps_noise_model2 =
-    // chrono_types::make_shared<ChNoiseRandomWalks>(0, 1.9553328563310663, gps_noise_model_update_rate2,
-    // 0.1824025488564503, 0.8738015856213586, 0.02, gps_reference2); auto gps_noise_model3 =
-    // chrono_types::make_shared<ChNoiseRandomWalks>(0, 1000,
-    // gps_noise_model_update_rate3, 1.6697923418653513, 87.9319706018043, 0.02, gps_reference3);
-    // auto gps_noise_model3 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 1.7667437059160909,
-    // gps_noise_model_update_rate3, 1.6697923418653513, 87.9319706018043, 0.02, gps_reference3);
-
-    auto gps_noise_model1 = chrono_types::make_shared<ChNoiseRandomWalks>(
-        0, 2, gps_noise_model_update_rate1, 1.6697923418653513, 87.9319706018043, 0.1, gps_reference1);
-
-    auto gps_noise_model2 = chrono_types::make_shared<ChNoiseRandomWalks>(
-        0, 2, gps_noise_model_update_rate2, 1.6697923418653513, 87.9319706018043, 0.1, gps_reference2);
-    auto gps_noise_model3 = chrono_types::make_shared<ChNoiseRandomWalks>(
-        0, 2, gps_noise_model_update_rate3, 1.6697923418653513, 87.9319706018043, 0.1, gps_reference3);
+    auto gps_noise_model2 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.16, gps_noise_model_update_rate2, 0.03,
+                                                                          0.05, gps_reference2);
+    auto gps_noise_model3 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.16, gps_noise_model_update_rate3, 0.03,
+                                                                          0.05, gps_reference3);
     // GPS parameters are the same for all 3 GPS sensors, except the Noise model update rate and GPS update rate.
     auto gps_offset_pose = chrono::ChFrame<double>({0, 0, 0}, Q_from_AngAxis(0, {1, 0, 0}));
     // Add gps1 sensor

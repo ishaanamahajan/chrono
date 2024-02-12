@@ -73,6 +73,8 @@ enum GPSNoiseModel {
 };
 // PSNoiseModel gps_noise_type = GPS_NONE;
 GPSNoiseModel gps_noise_type = GPS_RANDOMWALK;
+// GPSNoiseModel gps_noise_type = NORMAL;
+
 // GPS update rate in Hz
 int gps_update_rate = 10;
 
@@ -236,8 +238,7 @@ int main(int argc, char* argv[]) {
             gps_noise_model = chrono_types::make_shared<ChNoiseNone>();
             break;
         case GPS_RANDOMWALK:
-            gps_noise_model =
-                chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.016289174978068626, 1e-2, gps_reference);
+            gps_noise_model = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.016, 100, 0.03, 0.005, gps_reference);
     }
 
     // add a GPS sensor to one of the boxes

@@ -117,7 +117,6 @@ class CH_SENSOR_API ChNoiseRandomWalks : public ChNoiseModel {
                        float noise_model_update_rate,
                        double max_velocity,
                        double max_acceleration,
-                       double max_nudge_proportion,
                        ChVector<double> gps_reference);
     /// Class destructor
     ~ChNoiseRandomWalks() {}
@@ -134,13 +133,10 @@ class CH_SENSOR_API ChNoiseRandomWalks : public ChNoiseModel {
     double m_step_size;
     double m_max_velocity;
     double m_max_acceleration;
-    double m_max_nudge_proportion;
     ChVector<double> m_gps_reference;
     float m_last_updated_ch_time;
-    double m_bx;
-    double m_cx;
-    double m_by;
-    double m_cy;
+    ChVector<double> m_prev_error_p;
+    ChVector<double> m_prev_error_v;
 
     double interpolate_weighted_avg(ChVector<double>& data,
                                     float last_ch_time,
