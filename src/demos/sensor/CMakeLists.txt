@@ -18,6 +18,7 @@ set(DEMOS
 # Demos that combine sensor simulation with vehicle dynamics
 if(ENABLE_MODULE_IRRLICHT AND ENABLE_MODULE_VEHICLE AND ENABLE_MODULE_VEHICLE_MODELS)
     set(DEMOS ${DEMOS}
+      bug_fix_dART_viz
       demo_SEN_HMMWV
       demo_SEN_Gator
       demo_SEN_deformableSoil
