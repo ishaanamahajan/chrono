@@ -134,9 +134,9 @@ void ChNoiseRandomWalks::AddNoise(ChVector<double>& data, float last_ch_time, fl
         // double c_y = sample * data.y() / (maxD + data.y());
         // double c_z = sample * data.z() / (maxD + data.z());
         sample = -1;
-        double c_x = sample * data.x() / (maxD);
-        double c_y = sample * data.y() / (maxD);
-        double c_z = sample * data.z() / (maxD);
+        double c_x = sample * m_prev_error_p.x() / (maxD);
+        double c_y = sample * m_prev_error_p.y() / (maxD);
+        double c_z = sample * m_prev_error_p.z() / (maxD);
 
         // Limit c's to maxR
         // double maxR = 1.;
