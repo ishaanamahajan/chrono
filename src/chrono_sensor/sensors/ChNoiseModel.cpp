@@ -181,9 +181,9 @@ void ChNoiseRandomWalks::AddNoise(ChVector<double>& data, float last_ch_time, fl
 
         // Integrate to get random walk contributions
         m_prev_error_v += white_noise * time_step;
-        // If the norm of velocity is greater than max_velocity, set it back to 0
+        // If the norm of velocity is greater than max_velocity, set to max velocity
         if (m_prev_error_v.Length() > m_max_velocity) {
-            m_prev_error_v = ChVector<double>(0, 0, 0);
+            m_prev_error_v = m_prev_error_v / m_prev_error_v.Length() * m_max_velocity;
         }
 
         // Check all components of velocity and set to 0 if greater than max_velocity
