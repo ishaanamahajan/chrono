@@ -110,11 +110,23 @@ class CH_SENSOR_API ChNoiseNormalDrift : public ChNoiseModel {
 class CH_SENSOR_API ChNoiseRandomWalks : public ChNoiseModel {
   public:
     /// Class constructor with default tuning parameters
+    /// @param mean The mean of the normal distribution of the acceleration that is integrated twice to provide the
+    /// random walk
+    /// @param sigma The standard deviation of the normal distribution of the acceleration that is integrated twice to
+    /// provide the random walk
+    /// @param noise_model_update_rate The update rate of the noise model which defines the integration step size. Note:
+    /// This is different from the sensor update rate.
+    /// @param gps_reference The reference position of the GPS
     ChNoiseRandomWalks(float mean, float sigma, float noise_model_update_rate, ChVector<double> gps_reference);
     /// Class constructor with custom tuning parameters
-    /// @param mean The mean of the normal distribution
-    /// @param sigma The standard deviation of the normal distribution
-    /// @param noise_model_update_rate The update rate of the noise model
+    /// @param mean The mean of the normal distribution of the acceleration that is integrated twice to provide the
+    /// random walk
+    /// @param sigma The standard deviation of the normal distribution of the acceleration that is integrated twice to
+    /// provide the random walk
+    /// @param noise_model_update_rate The update rate of the noise model which defines the integration step size. Note:
+    /// This is different from the sensor update rate.
+    /// @param max_velocity The maximum allowable velocity for the random walk
+    /// @param max_acceleration The maximum allowable acceleration for the random walk
     /// @param gps_reference The reference position of the GPS
     ChNoiseRandomWalks(float mean,
                        float sigma,
@@ -135,16 +147,16 @@ class CH_SENSOR_API ChNoiseRandomWalks : public ChNoiseModel {
     virtual void AddNoise(ChVector<double>& data, float last_ch_time, float ch_time);
 
   private:
-    std::minstd_rand m_generator;     ///< random number generator
-    float m_mean;                     ///< mean of the normal distribution
-    float m_sigma;                    ///< standard deviation of the normal distribution
-    double m_step_size;               ///< current step size for the random walk
-    double m_max_velocity;            ///< maximum first derivative value for the random walk
-    double m_max_acceleration;        ///< maximum second derivative value for the random walk
-    ChVector<double> m_gps_reference; ///< reference position for the GPS to augment
-    float m_last_updated_ch_time;     ///< last time the noise model was updated  
-    ChVector<double> m_prev_error_p;  ///< previous error in position
-    ChVector<double> m_prev_error_v;  ///< previous first derivative value for the noise model
+    std::minstd_rand m_generator;      ///< random number generator
+    float m_mean;                      ///< mean of the normal distribution
+    float m_sigma;                     ///< standard deviation of the normal distribution
+    double m_step_size;                ///< current step size for the random walk
+    double m_max_velocity;             ///< maximum first derivative value for the random walk
+    double m_max_acceleration;         ///< maximum second derivative value for the random walk
+    ChVector<double> m_gps_reference;  ///< reference position for the GPS to augment
+    float m_last_updated_ch_time;      ///< last time the noise model was updated
+    ChVector<double> m_prev_error_p;   ///< previous error in position
+    ChVector<double> m_prev_error_v;   ///< previous first derivative value for the noise model
 };
 
 /// @} sensor_sensors

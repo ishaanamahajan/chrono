@@ -59,14 +59,14 @@ enum GPSNoiseModel {
 // PSNoiseModel gps_noise_type = GPS_NONE;
 GPSNoiseModel gps_noise_type = GPS_RANDOMWALK;
 // GPS update rate in Hz
-int gps_update_rate1 = 1;
+int gps_update_rate1 = 5;
 int gps_update_rate2 = 10;
 int gps_update_rate3 = 100;
 
 // GPS noise model update rate in Hz (for accuracy of noise generation, this may differ from GPS update rate).
-int gps_noise_model_update_rate1 = 100;
-int gps_noise_model_update_rate2 = 100;
-int gps_noise_model_update_rate3 = 100;
+int gps_noise_model_update_rate1 = 10;
+int gps_noise_model_update_rate2 = 10;
+int gps_noise_model_update_rate3 = 10;
 
 // Camera's horizontal field of view
 float fov = 1.408f;
@@ -90,7 +90,7 @@ ChVector<> gps_reference3(-89.412240758, 43.071986683, 0);
 double step_size = 1e-3;
 
 // Simulation end time
-float end_time = 100.0f;
+float end_time = 17.8f;
 
 // Save data
 bool save = true;
@@ -111,7 +111,7 @@ int main(int argc, char* argv[]) {
     // Create a stationary system to attach GPS Sensor to.
     // -------------------------------
     auto base = chrono_types::make_shared<ChBodyEasyBox>(1, 1, 1, 1, true, false);
-    base->SetPos(ChVector<>(0, 0, 0));
+    base->SetPos(ChVector<>(0., 0., 0));
     base->SetBodyFixed(true);  // the base does not move!
     sys.Add(base);
 
@@ -123,13 +123,56 @@ int main(int argc, char* argv[]) {
     // ---------------------------------------------
     // Create a GPS and add it to the sensor manager
     // ---------------------------------------------
-    auto gps_noise_model1 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.16, gps_noise_model_update_rate1, 0.03,
-                                                                          0.05, gps_reference1);
+    // auto gps_noise_model1 =
+    //     chrono_types::make_shared<ChNoiseRandomWalks>(0,                             // mean
+    //                                                   3.8,                           // std
+    //                                                   gps_noise_model_update_rate1,  // Model Update rate
+    //                                                   1.27,                          // max velocity
+    //                                                   21.5,                          // max velocity
+    //                                                   gps_reference1);
 
-    auto gps_noise_model2 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.16, gps_noise_model_update_rate2, 0.03,
-                                                                          0.05, gps_reference2);
-    auto gps_noise_model3 = chrono_types::make_shared<ChNoiseRandomWalks>(0, 0.16, gps_noise_model_update_rate3, 0.03,
-                                                                          0.05, gps_reference3);
+    // auto gps_noise_model2 =
+    //     chrono_types::make_shared<ChNoiseRandomWalks>(0,                             // mean
+    //                                                   3.8,                           // std
+    //                                                   gps_noise_model_update_rate2,  // Model Update rate
+    //                                                   1.27,                          // max velocity
+    //                                                   21.5,                          // max velocity
+    //                                                   gps_reference1);
+    // auto gps_noise_model3 =
+    //     chrono_types::make_shared<ChNoiseRandomWalks>(0,                             // mean
+    //                                                   3.8,                           // std
+    //                                                   gps_noise_model_update_rate3,  // Model Update rate
+    //                                                   1.27,                          // max velocity
+    //                                                   21.5,                          // max velocity
+    //                                                   gps_reference1);
+
+    auto gps_noise_model1 =
+        chrono_types::make_shared<ChNoiseRandomWalks>(0,                             // mean
+                                                      0.047,                         // std
+                                                      gps_noise_model_update_rate1,  // Model Update rate
+                                                      0.016,                         // max velocity
+                                                      0.152,                         // max acc
+                                                      gps_reference1);
+
+    auto gps_noise_model2 =
+        chrono_types::make_shared<ChNoiseRandomWalks>(0,                             // mean
+                                                      0.047,                         // std
+                                                      gps_noise_model_update_rate2,  // Model Update rate
+                                                      0.016,                         // max velocity
+                                                      0.152,                         // max acc
+                                                      gps_reference1);
+    auto gps_noise_model3 =
+        chrono_types::make_shared<ChNoiseRandomWalks>(0,                             // mean
+                                                      0.047,                         // std
+                                                      gps_noise_model_update_rate3,  // Model Update rate
+                                                      0.016,                         // max velocity
+                                                      0.152,                         // max acc
+                                                      gps_reference1);
+
+    ChVector<double> gps_noise_mean(0, 0, 0);
+    ChVector<double> gps_noise_stdev(0.017, 0.017, 0.017);  // meters
+
+    auto gps_noise_model_normal = chrono_types::make_shared<ChNoiseNormal>(gps_noise_mean, gps_noise_stdev);
     // GPS parameters are the same for all 3 GPS sensors, except the Noise model update rate and GPS update rate.
     auto gps_offset_pose = chrono::ChFrame<double>({0, 0, 0}, Q_from_AngAxis(0, {1, 0, 0}));
     // Add gps1 sensor
@@ -174,6 +217,19 @@ int main(int argc, char* argv[]) {
     gps3->PushFilter(chrono_types::make_shared<ChFilterGPSAccess>());  // Add a filter to access the gps data
     manager->AddSensor(gps3);                                          // Add GPS sensor to the sensor manager
 
+    auto gps4 = chrono_types::make_shared<ChGPSSensor>(
+        base,                   // body to which the GPS is attached
+        gps_update_rate1,       // update rate
+        gps_offset_pose,        // offset pose from body
+        gps_reference3,         // reference GPS location (GPS coordinates of simulation origin)
+        gps_noise_model_normal  // noise model to use for adding GPS noise
+    );
+    gps4->SetName("GPS4");
+    gps4->SetLag(gps_lag);
+    gps4->SetCollectionWindow(gps_collection_time);
+    gps4->PushFilter(chrono_types::make_shared<ChFilterGPSAccess>());  // Add a filter to access the gps data
+    manager->AddSensor(gps4);
+
     // -----------------
     // Initialize output
     // -----------------
@@ -189,12 +245,15 @@ int main(int argc, char* argv[]) {
     std::string gps1_file = gps_file;
     std::string gps2_file = gps_file;
     std::string gps3_file = gps_file;
-    gps1_file += "1HZ_stationary_gps.csv";
+    std::string gps4_file = gps_file;
+    gps1_file += "5HZ_stationary_gps.csv";
     gps2_file += "10HZ_stationary_gps.csv";
     gps3_file += "100HZ_stationary_gps.csv";
+    gps4_file += "normal_stationary_gps.csv";
     utils::CSV_writer gps1_csv(" ");
     utils::CSV_writer gps2_csv(" ");
     utils::CSV_writer gps3_csv(" ");
+    utils::CSV_writer gps4_csv(" ");
 
     // ---------------
     // Simulate system
@@ -205,10 +264,12 @@ int main(int argc, char* argv[]) {
     UserGPSBufferPtr bufferGPS1;
     UserGPSBufferPtr bufferGPS2;
     UserGPSBufferPtr bufferGPS3;
+    UserGPSBufferPtr bufferGPS4;
 
     int gps1_last_launch = 0;
     int gps2_last_launch = 0;
     int gps3_last_launch = 0;
+    int gps4_last_launch = 0;
 
     /*
      *Expirement: 3 GPSs run for the same time duration and at the same location, but with differing GPS and noise model
@@ -258,6 +319,18 @@ int main(int argc, char* argv[]) {
             gps3_csv << std::endl;
             gps3_last_launch = bufferGPS3->LaunchedCount;
         }
+        bufferGPS4 = gps4->GetMostRecentBuffer<UserGPSBufferPtr>();
+        if (bufferGPS4->Buffer && bufferGPS4->LaunchedCount > gps4_last_launch) {
+            // Save the gps data to file
+            GPSData gps4_data = bufferGPS4->Buffer[0];
+            gps4_csv << std::fixed << std::setprecision(10);
+            gps4_csv << gps4_data.Longitude;  // Longitude
+            gps4_csv << gps4_data.Latitude;   // Latitude
+            gps4_csv << gps4_data.Altitude;   // Altitude
+            gps4_csv << gps4_data.Time;       // Time
+            gps4_csv << std::endl;
+            gps4_last_launch = bufferGPS4->LaunchedCount;
+        }
 
         // Update sensor manager
         // Will render/save/filter automatically
@@ -278,6 +351,7 @@ int main(int argc, char* argv[]) {
     gps1_csv.write_to_file(gps1_file);
     gps2_csv.write_to_file(gps2_file);
     gps3_csv.write_to_file(gps3_file);
+    gps4_csv.write_to_file(gps4_file);
 
     return 0;
 }
