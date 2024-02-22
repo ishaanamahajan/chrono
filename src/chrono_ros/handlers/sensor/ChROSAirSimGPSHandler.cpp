@@ -43,7 +43,9 @@ ChROSAirSimGPSHandler::ChROSAirSimGPSHandler(double update_rate,
                                              float vdop_init,
                                              float hdop_final,
                                              float vdop_final)
-    : ChROSGPSHandler(update_rate, gps, topic_name),
+    : ChROSHandler(update_rate),
+      m_gps(gps),
+      m_topic_name(topic_name),
       m_eph_init(hdop_init),
       m_epv_init(vdop_init),
       m_eph(hdop_init),
@@ -56,6 +58,22 @@ ChROSAirSimGPSHandler::ChROSAirSimGPSHandler(double update_rate,
       m_lat_std(0.02f),
       m_alt_std(0.02f),
       m_last_time(0.f) {}
+
+bool ChROSAirSimGPSHandler::Initialize(std::shared_ptr<ChROSInterface> interface) {
+    if (!ChROSSensorHandlerUtilities::CheckSensorHasFilter<ChFilterGPSAccess, ChFilterGPSAccessName>(m_gps)) {
+        return false;
+    }
+
+    if (!ChROSHandlerUtilities::CheckROSTopicName(interface, m_topic_name)) {
+        return false;
+    }
+
+    m_publisher = interface->GetNode()->create_publisher<sensor_msgs::msg::NavSatFix>(m_topic_name, 1);
+
+    m_gps_msg.header.frame_id = m_gps->GetName();
+
+    return true;
+}
 
 void ChROSAirSimGPSHandler::Tick(double time) {
     auto gps_ptr = m_gps->GetMostRecentBuffer<UserGPSBufferPtr>();

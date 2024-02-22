@@ -19,9 +19,14 @@
 #ifndef CH_ROS_AirSim_GPS_HANDLER
 #define CH_ROS_AirSim_GPS_HANDLER
 
-#include "chrono_ros/handlers/sensor/ChROSGPSHandler.h"
-
 #include "chrono_ros/ChROSHandler.h"
+
+#include "chrono_sensor/sensors/ChGPSSensor.h"
+
+#include "rclcpp/publisher.hpp"
+#include "sensor_msgs/msg/nav_sat_fix.hpp"
+
+#include <array>
 
 namespace chrono {
 namespace ros {
@@ -30,7 +35,7 @@ namespace ros {
 /// @{
 
 /// This handler is responsible for interfacing a ChGPSSensor to ROS. Will publish sensor_msgs::msg::NavSatFix.
-class ChROSAirSimGPSHandler : public ChROSGPSHandler {
+class ChROSAirSimGPSHandler : public ChROSHandler {
   public:
     /// Constructor. The update rate is set to gps->GetUpdateRate().
     /// The update rate corresponds to the sensor's update rate.
@@ -49,6 +54,8 @@ class ChROSAirSimGPSHandler : public ChROSGPSHandler {
                           float vdop_init,
                           float hdop_final,
                           float vdop_final);
+    /// Initializes the handler.
+    virtual bool Initialize(std::shared_ptr<ChROSInterface> interface) override;
 
   protected:
     virtual void Tick(double time) override;
