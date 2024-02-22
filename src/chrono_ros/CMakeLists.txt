@@ -135,6 +135,8 @@ if (ENABLE_MODULE_SENSOR)
     handlers/sensor/ChROSIMUHandler.cpp
     handlers/sensor/ChROSGPSHandler.h
     handlers/sensor/ChROSGPSHandler.cpp
+    handlers/sensor/ChROSAirSimGPSHandler.h
+    handlers/sensor/ChROSAirSimGPSHandler.cpp
 
     handlers/sensor/ChROSSensorHandlerUtilities.h
     handlers/sensor/ChROSSensorHandlerUtilities.cpp
