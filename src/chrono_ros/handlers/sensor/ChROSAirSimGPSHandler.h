@@ -19,7 +19,7 @@
 #ifndef CH_ROS_AirSim_GPS_HANDLER
 #define CH_ROS_AirSim_GPS_HANDLER
 
-#include "chrono_ros/ChROSGPSHandler.h"
+#include "chrono_ros/handlers/sensor/ChROSGPSHandler.h"
 
 #include "chrono_ros/ChROSHandler.h"
 
@@ -65,7 +65,7 @@ class ChROSAirSimGPSHandler : public ChROSGPSHandler {
     /// used to calculate the covariance of the gps data using code from this driver
 
     /// https://github.com/ros-drivers/nmea_navsat_driver/blob/06d71c7c5995fc8ef5579906d1d8097dbacf2c32/src/libnmea_navsat_driver/driver.py#L180C12-L198C60
-    std::array<double, 9> CalculateCovariance(const chrono::sensor::GPSData& gps_data, double time);
+    std::array<double, 9> CalculateCovariance(const chrono::sensor::GPSData& gps_data);
 
   private:
     std::shared_ptr<chrono::sensor::ChGPSSensor> m_gps;  ///< handle to the gps sensor

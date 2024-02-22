@@ -97,7 +97,7 @@ std::array<double, 9> ChROSAirSimGPSHandler::CalculateCovariance(const GPSData& 
     std::array<double, 9> covariance;
     covariance[0] = (m_eph * m_lon_std) * (m_eph * m_lon_std);
     covariance[4] = (m_eph * m_lat_std) * (m_eph * m_lat_std);
-    covariance[8] = (2. * m_eph * m_alt_std) * (2. * m_eph * m_alt_dev);
+    covariance[8] = (2. * m_eph * m_alt_std) * (2. * m_eph * m_alt_std);
 
     return covariance;
 }
