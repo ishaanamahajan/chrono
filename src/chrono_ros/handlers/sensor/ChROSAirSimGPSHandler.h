@@ -44,7 +44,8 @@ class ChROSAirSimGPSHandler : public ChROSHandler {
                           float hdop_init,
                           float vdop_init,
                           float hdop_final,
-                          float vdop_final);
+                          float vdop_final,
+                          float timeConstant);
 
     /// Full constructor. Takes a ChGPSSensor, update rate, and topic name.
     ChROSAirSimGPSHandler(double update_rate,
@@ -53,7 +54,8 @@ class ChROSAirSimGPSHandler : public ChROSHandler {
                           float hdop_init,
                           float vdop_init,
                           float hdop_final,
-                          float vdop_final);
+                          float vdop_final,
+                          float timeConstant);
     /// Initializes the handler.
     virtual bool Initialize(std::shared_ptr<ChROSInterface> interface) override;
 

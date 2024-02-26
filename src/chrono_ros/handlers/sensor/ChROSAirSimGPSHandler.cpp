@@ -33,8 +33,16 @@ ChROSAirSimGPSHandler::ChROSAirSimGPSHandler(std::shared_ptr<chrono::sensor::ChG
                                              float hdop_init,
                                              float vdop_init,
                                              float hdop_final,
-                                             float vdop_final)
-    : ChROSAirSimGPSHandler(gps->GetUpdateRate(), gps, topic_name, hdop_init, vdop_init, hdop_final, vdop_final) {}
+                                             float vdop_final,
+                                             float timeConstant)
+    : ChROSAirSimGPSHandler(gps->GetUpdateRate(),
+                            gps,
+                            topic_name,
+                            hdop_init,
+                            vdop_init,
+                            hdop_final,
+                            vdop_final,
+                            timeConstant) {}
 
 ChROSAirSimGPSHandler::ChROSAirSimGPSHandler(double update_rate,
                                              std::shared_ptr<chrono::sensor::ChGPSSensor> gps,
@@ -42,7 +50,8 @@ ChROSAirSimGPSHandler::ChROSAirSimGPSHandler(double update_rate,
                                              float hdop_init,
                                              float vdop_init,
                                              float hdop_final,
-                                             float vdop_final)
+                                             float vdop_final,
+                                             float timeConstant)
     : ChROSHandler(update_rate),
       m_gps(gps),
       m_topic_name(topic_name),
@@ -52,8 +61,8 @@ ChROSAirSimGPSHandler::ChROSAirSimGPSHandler(double update_rate,
       m_epv(vdop_init),
       m_eph_final(hdop_final),
       m_epv_final(vdop_final),
-      m_eph_timeConstant(0.9f),
-      m_epv_timeConstant(0.9f),
+      m_eph_timeConstant(timeConstant),
+      m_epv_timeConstant(timeConstant),
       m_lon_std(0.02f),
       m_lat_std(0.02f),
       m_alt_std(0.02f),
