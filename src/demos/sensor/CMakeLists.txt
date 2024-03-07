@@ -12,6 +12,7 @@ set(DEMOS
   demo_SEN_tachometer
   demo_SEN_radar1
   demo_SEN_GPS_RandomWalks_Stationary
+  demo_SEN_crank
 
 )
 
